@@ -1,0 +1,39 @@
+1234567Abcdef?Duoc
+
+
+actividad rent a house 
+--caso1 
+select * from empleado;
+
+select 'El empledo '|| nombre_emp ||' ' || appaterno_emp||' ' || apmaterno_emp|| ' nacio el  ' || fecnac_emp  "Listado de cumpleaños" 
+from empleado;
+
+r: realizar una consula en la base de datos donde se debe obtener el cumpleaños de cada empleado
+
+
+--caso 2
+
+select numrut_cli "RUT", dvrut_cli, nombre_cli ||' '|| appaterno_cli ||' '|| apmaterno_cli "Nombre cliente",
+renta_cli "renta", fonofijo_cli "telefono fijo", celular_cli "celular cliente"
+from cliente;
+
+--caso 3
+select * from empleado;
+
+select nombre_emp ||' '|| appaterno_emp || ' '|| apmaterno_emp "Nombr empleado", sueldo_emp "sueldo", sueldo_emp *0.5 "Bono por capacitacion"
+
+from empleado
+order by sueldo_emp DESC;
+
+--caso4 
+
+select * from propiedad;
+
+select nro_propiedad "nro propiedad", numrut_prop "rut propietario" , direccion_propiedad "direccion" , valor_arriendo "valor arriendo" , valor_arriendo * 0.054 "valor compensacion"
+from propiedad;
+
+r: recuperar los datos del valor arriendo y agregarle la compensacion que prometio la empresa a los clientes dueños de propiedades 
+
+--caso5
+
+

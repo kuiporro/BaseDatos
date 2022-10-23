@@ -1,0 +1,110 @@
+--CASO 1
+
+select rut_cliente, UPPER (nombre)||' '|| upper(apellido_p) ||' '|| upper(apellido_m) "NOMBRE", 
+
+fecha_baja "FECHA DE BAJA",
+
+((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(FECHA_BAJA, 'YYYY')) + trunc(((months_between(sysdate, fecha_baja))/12), 2)) "AÑOS",
+
+'+56' || TELEFONO "TELEFONO",
+
+CASE WHEN ((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(FECHA_BAJA, 'YYYY')) + trunc(((months_between(sysdate, fecha_baja))/12), 2)) < 1 THEN 'FUERA DEL RANGO'
+ELSE CASE WHEN ((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(FECHA_BAJA, 'YYYY')) + trunc(((months_between(sysdate, fecha_baja))/12), 2)) >= 1 AND ((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(FECHA_BAJA, 'YYYY')) + trunc(((months_between(sysdate, fecha_baja))/12), 2)) < 4
+THEN 'PROBABLE'
+ELSE CASE WHEN ((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(FECHA_BAJA, 'YYYY')) + trunc(((months_between(sysdate, fecha_baja))/12), 2)) >= 4 AND ((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(FECHA_BAJA, 'YYYY')) + trunc(((months_between(sysdate, fecha_baja))/12), 2)) < 7
+THEN 'POCO PROBABLE'
+ELSE CASE WHEN ((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(FECHA_BAJA, 'YYYY')) + trunc(((months_between(sysdate, fecha_baja))/12), 2)) >= 7 
+THEN 'IMPROBABLE' END END END END "PROBABILIDAD"
+
+from cliente
+where fecha_baja is not null;
+
+
+
+
+--CASO 2
+
+select UPPER(NOMBRE) ||' '||  UPPER(apellido_p) ||' '|| UPPER(apellido_m) "NOMBRE",
+TO_CHAR(SYSDATE,( 'day dd "de" Month')) "REUNION",
+
+LOWER (substr(NOMBRE,0,2))||'.'||LOWER (APELLIDO_P)||''|| substr(LOWER (APELLIDO_M),(LENGTH(apellido_m))) "USUARIO", 
+replace( substr(rut_ejecutivo,0,9),'.','') "CLAVE" 
+
+FROM EJECUTIVO
+ORDER BY apellido_p ASC ;
+
+--CASO 3
+
+select rut_cliente  ,
+    case when domicilio is null THEN 'Pendiente' else 'Aplica el beneficio' end as Estado,
+    fecha_alta, (to_char(sysdate, 'yyyy') - to_char(fecha_alta, 'yyyy')) as año ,
+    TO_CHAR(((to_char(sysdate, 'yyyy') - to_char(fecha_alta, 'yyyy'))*10000),'L999G999G999') as GIFTCARD
+
+
+    from cliente
+
+    where  to_char(sysdate, 'yyyy') - to_char(fecha_alta, 'yyyy') >= '3' and TO_CHAR(fecha_baja) is null;
+
+--CASO 4
+
+SELECT NRO_CUENTA, FECHA "FECHA ABONO",
+
+TRUNC (MONTHS_BETWEEN(SYSDATE,FECHA),1) "MESES TRANSCURRIDOS",TO_CHAR (ABONO, 'L9G999G999')"ABONO",
+
+CASE  WHEN  ABONO >= 50000 AND  ABONO <= 100000 THEN CONCAT('2% ->',TO_CHAR (0.02*ABONO,'L999G999'))
+WHEN  ABONO >= 100001 AND  ABONO <= 300000 THEN CONCAT('3% ->',TO_CHAR (0.03*ABONO,'L999G999'))
+WHEN  ABONO >= 300001 AND  ABONO <= 1000000 THEN  CONCAT('4% ->',TO_CHAR(0.04*ABONO,'L999G999'))
+WHEN ABONO >= 1000001 THEN CONCAT('5% ->',TO_CHAR (0.05*ABONO,'L999G999'))
+ELSE '0%' END "% BONIFICACION",
+
+CASE  WHEN  ABONO >= 50000 AND  ABONO <= 100000 THEN TO_CHAR (1.02*ABONO,'L999G999')
+WHEN  ABONO >= 100001 AND  ABONO <= 300000 THEN TO_CHAR (1.03*ABONO,'L999G999')
+WHEN  ABONO >= 300001 AND  ABONO <= 1000000 THEN TO_CHAR(1.04*ABONO,'L9G999G999')
+WHEN ABONO >= 1000001 THEN TO_CHAR (1.05*ABONO,'L999G999')
+ELSE TO_CHAR (ABONO,'L999G999') END "ABONO MÁS BONIFICACION"
+
+FROM CUENTA_REGISTROS
+WHERE ABONO IS NOT NULL
+ORDER BY FECHA DESC;
+
+--CASO 5
+
+SELECT RUT_EJECUTIVO, NOMBRE, APELLIDO_P, APELLIDO_M, FECHA_CONTRATO,
+TRUNC(((TO_CHAR(SYSDATE,'YYYY') - TO_CHAR(FECHA_CONTRATO,'YYYY')) + (TO_CHAR(SYSDATE,'MM') - TO_CHAR(FECHA_CONTRATO,'MM'))/12), 2) ANIOS ,
+CASE WHEN NIVEL = 1 THEN TO_CHAR(700000, '$999G999') 
+eLSE CASE WHEN NIVEL = 2 THEN TO_CHAR(900000,'$999G999')
+ELSE CASE WHEN NIVEL = 3 THEN TO_CHAR(1200000,'$9G999G999')
+END END END "SUELDO", 
+CASE WHEN round(((TO_CHAR(SYSDATE,'YYYY') - TO_CHAR(FECHA_CONTRATO,'YYYY')) + (TO_CHAR(SYSDATE,'MM') - TO_CHAR(FECHA_CONTRATO,'MM'))/12), 2) BETWEEN 1 and 8.4 THEN 'Medio Sueldo' 
+eLSE CASE WHEN ROUND(((TO_CHAR(SYSDATE,'YYYY') - TO_CHAR(FECHA_CONTRATO,'YYYY')) + (TO_CHAR(SYSDATE,'MM') - TO_CHAR(FECHA_CONTRATO,'MM'))/12), 2) BETWEEN 8.5 and 11.49 THEN 'UN SUELDO'
+ELSE CASE WHEN ROUND(((TO_CHAR(SYSDATE,'YYYY') - TO_CHAR(FECHA_CONTRATO,'YYYY')) + (TO_CHAR(SYSDATE,'MM') - TO_CHAR(FECHA_CONTRATO,'MM'))/12), 2) BETWEEN 11.5 and 14.49   THEN 'DOS SUELDOS'
+ELSE CASE WHEN ROUND(((TO_CHAR(SYSDATE,'YYYY') - TO_CHAR(FECHA_CONTRATO,'YYYY')) + (TO_CHAR(SYSDATE,'MM') - TO_CHAR(FECHA_CONTRATO,'MM'))/12), 2) >=14.5   THEN 'TRES SUELDOS'
+END END END end "AGUINALDO", lower(substr(nombre, 0,2)) || '.' || lower (apellido_p)|| lower(substr(apellido_m,0,1)) || '@bvvo.cl' "CORREO"
+FROM EJECUTIVO
+WHERE TRUNC(((TO_CHAR(SYSDATE,'YYYY') - TO_CHAR(FECHA_CONTRATO,'YYYY')) + (TO_CHAR(SYSDATE,'MM') - TO_CHAR(FECHA_CONTRATO,'MM'))/12), 2) BETWEEN '&ANIOMIN' AND '&ANIOMAX'
+ORDER BY NOMBRE DESC;
+
+Según la información del Caso 5, ¿Cuál es el problema que se debe resolver?
+
+R: El problema a resolver es la desmotivación de los ejecutivos por el contexto mundial (pandemia).
+
+
+La solución que se requiere, en qué va a mejorar el negocio:
+
+R: Va a ayudar a aumentar la motivación en los ejecutivos, de manera que, ayuda de manera directa en el desempeño de cada uno de los empleados.
+
+Detalle, en lenguaje natural, los pasos para construir la solución al problema planteado
+
+R:• Se inicia la consulta con el RUT del ejecutivo
+• Se sigue con el nombre, apellido paterno, apellido materno
+• Fecha de contrato del ejecutivo
+• Preguntamos por la cantidad de años que ha estado trabajado el ejecutivo
+• En base al problema nosotros usamos esta tabla para asignar los sueldos en las consultas
+NIVEL    SUELDO
+1    $700.000
+2    $900.000
+3    $1.200.000
+Por ende, nosotros utilizamos una serie de condiciones en base al nivel del ejecutivo para calcular     los sueldos de los ejecutivos
+• Posterior al sueldo nosotros asignamos los aguinaldos de los ejecutivos en base al tiempo en la empresa que ellos presentan
+• Después generamos el correo del ejecutivo con funciones para “cortar” palabras, etc, con el fin de usar las dos primeras letras del nombre del ejecutivo, un punto, el apellido paterno entero, 
+  la primera letra del apellido materno y finalmente unimos todo esto con un “@bvvo.cl”.

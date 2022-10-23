@@ -1,0 +1,110 @@
+en esta clase vimos como sacar las fechas del sistema y de la base de datos
+
+
+sysdate -------> fecha exacta del sistema
+
+SELECT SYSDATE FROM dual;
+
+
+para comparar fechas asi será el codigo
+
+SELECT MONTHS_BETWEEN('11/NOV/1999, '11/NOV/1998') MESES
+FROM dual;
+
+
+
+
+
+SELECT EXTRACT(MINUTE FROM TIMESTAMP '1999-01-01 14:37:49'),
+
+    EXTRACT(SECOND FROM TIMESTAMP '1999-01-01 14:37:49'),
+
+    EXTRACT(HOUR FROM TIMESTAMP '1999-01-01 14:37:49')
+
+  FROM DUAL;
+
+
+SELECT first_name || ' ' || last_name || ' ingresó a la empresa el ' || 
+
+    EXTRACT (DAY FROM hire_date) || ' de ' || 
+
+    EXTRACT (MONTH FROM hire_date) || ' del año ' || 
+
+    EXTRACT(YEAR FROM hire_date) "INFORMACION DE CONTRATOS" 
+
+FROM HR.employees
+
+ORDER BY EXTRACT(YEAR FROM hire_date) DESC, last_name;
+
+
+
+SELECT EXTRACT(YEAR FROM SYSDATE) AS "AÑO ACTUAL",
+
+    EXTRACT(DAY FROM SYSDATE) AS "DÍA",
+
+    EXTRACT(MONTH FROM SYSDATE) AS "MES"
+
+FROM DUAL;
+
+
+SELECT EXTRACT(YEAR FROM DATE '1998-03-07') FROM DUAL;
+
+
+
+SELECT employee_id "ID EMPLEADO", 
+
+    first_name || ' ' || last_name "NOMBRE EMPLEADO",
+
+    hire_date,
+
+    MONTHS_BETWEEN(SYSDATE,hire_date)/12,
+
+    ROUND(MONTHS_BETWEEN(SYSDATE,hire_date)/12) "AÑOS TRABAJADOS"
+
+FROM HR.employees;
+
+
+SELECT employee_id "ID EMPLEADO", 
+
+    first_name || ' ' || last_name "NOMBRE EMPLEADO",
+
+    salary salario, ROUND(MONTHS_BETWEEN(SYSDATE,hire_date)/12) "AÑOS TRABAJADOS",
+
+    ROUND(salary*(ROUND(MONTHS_BETWEEN(SYSDATE,hire_date)/12)/100))"PORC. SALARIO SEGUN AÑOS TRAB"
+
+FROM hr.employees;
+
+
+SELECT last_name, hire_date, 
+
+    round((sysdate - hire_date)/7, 2),
+
+    ROUND((SYSDATE - hire_date) / 7 ) "SEMANAS CONTRATADO",
+
+    hire_date - 2 "FECHA CONTRATO MENOS 2 DIAS",
+
+    hire_date + 10 "FECHA CONTRATO MAS 10 DIAS"
+
+FROM hr.employees
+
+WHERE department_id = 90;
+
+
+
+
+
+SELECT MONTHS_BETWEEN('11/SEP/2021','11/JUN/2020') "MONTHS_BETWEEN",
+
+    ADD_MONTHS('20/SEP/2019',3) "ADD_MONTHS",
+
+    NEXT_DAY('15/SEP/2021','SUNDAY') "NEXT_DAY",
+
+    LAST_DAY('20/FEB/2020') "LAST_DAY"
+
+FROM dual;
+
+
+
+
+
+
